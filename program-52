@@ -1,0 +1,112 @@
+#!/bin/bash
+
+HEX_BASE="${HEX_BASE:-demo}"
+
+set -e
+
+SN=
+VERSION=
+TTY=
+
+
+LONG_OPTIONS="sn:,version:"
+SHORT_OPTIONS="s:,v:"
+
+args=$(getopt -o $SHORT_OPTIONS -l $LONG_OPTIONS -- "$@")
+
+cur_file="${BASH_SOURCE[${#BASH_SOURCE[@]} - 1]}"
+cur_dir="$(dirname "${cur_file}")"
+abs_dir="$(cd $(dirname "${cur_file}"); pwd)"
+
+mkdir -p $cur_dir/build
+
+e_color()(set -o pipefail;"$@" |sed $'s,.*,\e[31m&\e[m,'>&2)
+
+printUsage() {
+   echo "Usage: program-52 --sn <serial number of dk> --version <dfu scenario version> --tty <tty from /dev folder that can be used for serial DFU>"
+   echo "       it programs the Thingy 52 board pca20020 via a DK ( pca10040 )."
+   echo "       -s --sn         the development board pca10040 serial number."
+   echo "       -v --version    one of values: "
+   echo "            0 - for initial empty dfu (no led programming, no GATT adv, no application just bootloader, basic DFU and softdevice"
+   echo "            1 - led application with DFU and GATT adv for provisioning with mobile phone app"
+   echo "       -t --tty        only in combination with version 1 option, tty from /dev folder that can be used for serial DFU; default is ttyACM0"
+
+}
+
+if [[ $? -eq 0 ]]; then 
+  eval set -- "$args"
+  while true; do
+      case "$1" in
+    -s|--sn)
+        shift; # The arg is next in position args
+        SN=$1
+        ;;
+    -v|--version)
+        shift;
+        VERSION=$1
+        ;;
+    -t|--tty)
+        shift;
+        TTY=$1
+        ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+  done
+fi
+
+
+if [ -z $SN ]; then
+    e_color echo "serial number of chip must be given"
+    printUsage
+    exit 1;
+fi
+
+if [ -z $VERSION ]; then
+    e_color echo "version of the demo must be given ( value 0 or 1)"
+    printUsage
+    exit 1;
+fi
+
+if [ -z $TTY ]; then
+    TTY="ttyACM0"
+fi
+
+
+echo "Using hex files from: $HEX_BASE"
+BUILD_FILE_RELEASE=build/dfu_pca20020_s132_6.1.1_Release/dfu_pca20020_s132_6.1.1.hex
+BUILD_FILE_DEBUG=build/dfu_pca20020_s132_6.1.1_Debug/dfu_pca20020_s132_6.1.1.hex
+BUILD_FILE_PREBUILT=$HEX_BASE/dfu_pca20020_s132_6.1.1.hex
+DFU_FILE=
+
+if [ "$VERSION" = "0" ]; then
+    echo "THIS WILL FLASH INITIAL ( version 0 ) FW for the THINGY-52 board. Make sure that you DO HAVE connected the board to the Debug-Out of the DK and then press ANY key to continue!"
+    read 
+    nrfjprog --eraseall -s $SN
+    nrfjprog --program $HEX_BASE/initial/s132_nrf52_6.1.1_softdevice.hex --chiperase -s $SN
+    nrfjprog --program $HEX_BASE/initial/mesh_bootloader_serial_nrf52832_xxAA.hex -s $SN
+    nrfjprog --program $HEX_BASE/initial/dfu_nrf52832_xxAA_s132_6.1.1.hex -s $SN
+    nrfjprog --program $HEX_BASE/initial/device_page_pca20020_s132_6.1.1.hex -s $SN
+    nrfjprog --reset -s $SN
+    nrfjprog --pinreset -s $SN
+else
+    if [ -f "$BUILD_FILE_RELEASE" ]; then
+	echo "perform Serial DFU using file $BUILD_FILE_RELEASE"
+	DFU_FILE=$BUILD_FILE_RELEASE
+    else if [ -f "$BUILD_FILE_DEBUG" ]; then
+	     echo "perform Serial DFU using file $BUILD_FILE_RELEASE"
+	     DFU_FILE=$BUILD_FILE_DEBUG
+	 else
+	     echo "perform Serial DFU using file $BUILD_FILE_RELEASE"
+	     DFU_FILE=$BUILD_FILE_PREBUILT
+	 fi
+    fi
+    echo "THIS WILL do serial DFU ( version 1 ) FW for the THINGY-52 cluster. Make sure that you do not have anything connected to the Debug-Out of the DK and then press ANY key to continue!"
+    read
+    nrfjprog --pinreset -s $SN
+    nrfutilmesh dfu genpkg --application $DFU_FILE --company-id 0x0000003B --application-id 2 --application-version 2 --key-file private.pem --sd-req 0x00 --mesh build/dfu_test.zip
+    nrfutilmesh dfu serial -pkg build/dfu_test.zip -p /dev/$TTY -b 115200 -fc --mesh
+fi
