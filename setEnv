@@ -1,8 +1,8 @@
 #!/bin/sh
 
-SDK_ROOT="/home/osimion/work/nrf/sdk"
-SDK_MESH="/home/osimion/work/nrf/sdk_mesh"
-SDK_THINGY52="/home/osimion/work/nrf/sdk_thingy"
+SDK_ROOT="TOCHANGE"
+SDK_MESH="TOCHANGE"
+SDK_THINGY52="TOCHANGE"
 
 
 line="SDK_ROOT=$SDK_ROOT;SDK_MESH=$SDK_MESH;SDK_THINGY52=$SDK_THINGY52;CMSIS_CONFIG_TOOL=\$(SDK_ROOT:nRF5_SDK_15.3.0)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
