@@ -7,7 +7,7 @@ SDK_THINGY52="TOCHANGE"
 
 line="SDK_ROOT=$SDK_ROOT;SDK_MESH=$SDK_MESH;SDK_THINGY52=$SDK_THINGY52;CMSIS_CONFIG_TOOL=\$(SDK_ROOT:nRF5_SDK_15.3.0)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
 for filename in *.emProject; do
-    cat $filename | sed -E "s~[[:space:]]+macros=.*~macros=\"$line\"~g"
+    sed -i -E "s~[[:space:]]+macros=.*~macros=\"$line\"~g" $filename
 done
 
 export SDK_ROOT SDK_MESH SDK_THINGY52

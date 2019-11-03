@@ -25,7 +25,7 @@
       linker_section_placement_file="$(ProjectDir)/flash_placement.xml"
       linker_section_placement_macros="FLASH_PH_START=0x0;FLASH_PH_SIZE=0x78000;RAM_PH_START=0x20000000;RAM_PH_SIZE=0xf000;FLASH_START=0x26000;RAM_START=0x20002da0"
       linker_section_placements_segments="FLASH RX 0x0 0x78000;RAM RWX 0x20000000 0xf000"
-      macros="SDK_ROOT=/home/osimion/work/nrf/sdk;SDK_THINGY52=/home/osimion/work/nrf/sdk_thingy;SDK_MESH=/home/osimion/work/nrf/sdk_mesh;CMSIS_CONFIG_TOOL=$(SDK_ROOT:nRF5_SDK_15.3.0)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
+      macros="CMSIS_CONFIG_TOOL=$(SDK_ROOT:nRF5_SDK_15.3.0)/external_tools/cmsisconfig/CMSIS_Configuration_Wizard.jar"
       project_directory=""
       project_type="Executable" />
     <folder Name="Application">
