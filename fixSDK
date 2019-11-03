@@ -1,0 +1,16 @@
+#!/bin/sh
+
+if [ -z "$SDK_ROOT" ]; then
+    echo "SDK_ROOT not set. Have you run \". setEnv\" ?"
+    exit 1;
+fi
+
+if [ -z "$SDK_THINGY52" ]; then
+    echo "SDK_THINGY52 not set. Have you run \". setEnv\" ?"
+    exit 1;
+fi
+
+
+mv $SDK_ROOT/components/boards/pca20020.h $SDK_ROOT/components/boards/pca20020_old.h 2>/dev/null
+
+cp -r patch/sdk_thingy/* $SDK_THINGY52/

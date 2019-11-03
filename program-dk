@@ -88,7 +88,7 @@ if [ "$VERSION" = "0" ]; then
     nrfjprog --eraseall -s $SN
     nrfjprog --program $HEX_BASE/initial/s132_nrf52_6.1.1_softdevice.hex --chiperase -s $SN
     nrfjprog --program $HEX_BASE/initial/mesh_bootloader_serial_nrf52832_xxAA.hex -s $SN
-    nrfjprog --program $HEX_BASE/initial/dfu_nrf52832_xxAA_s132_6.1.1.hex -s $SN
+    nrfjprog --program $HEX_BASE/initial/dfu_pca10040_initial_s132_6.1.1.hex -s $SN
     nrfjprog --program $HEX_BASE/initial/device_page_pca10040_s132_6.1.1.hex -s $SN
     nrfjprog --reset -s $SN
     nrfjprog --pinreset -s $SN

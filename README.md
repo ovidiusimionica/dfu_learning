@@ -78,6 +78,7 @@ e.g. ./program-52 -s 682257226 -v 1
 ```
 
 During DFU the dk will keep Led 2 and Led 3 on ( another sign that the DK has a different App running on it).
+Also all the Thingies will breath YELLOW as a sign that this upgrade is intended for them.
 
 At the end the Thingies will automatically reset and start breathing RED as sign that they are not yet provisioned in a Mesh.
 
